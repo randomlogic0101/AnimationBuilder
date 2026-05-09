@@ -1,0 +1,55 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="1920"
+  height="1080">
+
+  <style>
+    text {
+      font-family:
+        "Fira Code",
+        "DejaVu Sans Mono",
+        monospace;
+
+      dominant-baseline: middle;
+    }
+
+    .scrolling {
+      font-size: 120px;
+      fill: white;
+    }
+
+    .timer {
+      font-size: 200px;
+      fill: white;
+      text-anchor: middle;
+    }
+
+    .flash {
+      font-size: 140px;
+      fill: red;
+      text-anchor: middle;
+    }
+
+  </style>
+
+  <rect
+    width="100%"
+    height="100%"
+    fill="black" />
+
+  <text
+    x="960"
+    y="540"
+    fill="white"
+    font-size="240"
+    text-anchor="middle"
+
+    data-anim="countdown flash"
+    data-start="10"
+    data-duration="10"
+    data-frequency="0.25">
+
+    0:10
+  </text>
+
+</svg>
