@@ -6,4 +6,4 @@
 python renderer.py \
        --scene Examples/starting_soon.svg \
        --output Output/starting_soon.mp4 \
-       --duration $((30))
+       --duration $((5*60+30))
