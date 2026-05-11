@@ -6,13 +6,13 @@
 mkdir -p Output
 
 # Testing transforming a group
-python renderer.py \
+python src/animation_builder/main.py \
        --scene Assets/robotConcept.svg \
        --output Output/robotConcept.mp4 \
        --duration $((30))
 
 # Testing overlay ed transparencies
-python renderer.py \
+python src/animation_builder/main.py \
        --scene Assets/inkscapeTest001.svg \
        --output Output/inkscapeTest.mp4 \
        --duration $((30))

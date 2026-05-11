@@ -5,7 +5,7 @@
 
 mkdir -p Output
 
-python renderer.py \
+python src/animation_builder/main.py \
        --scene Examples/starting_soon.svg \
        --output Output/starting_soon.mp4 \
        --duration $((5*60+30))
