@@ -18,4 +18,4 @@ python renderer.py \
        --duration $((30))
 
 # Add transparency to the robotConcept file
-ffmpeg -i robotConcept.mp4 -vf "colorkey=black:0.3:0.1,crop=iw:ih:0:0" -c:v prores_ks -profile:v 4 -pix_fmt yuva444p10le -c:a copy logo.mov
+ffmpeg -i Output/robotConcept.mp4 -vf "colorkey=black:0.3:0.1,crop=iw:ih:0:0" -c:v prores_ks -profile:v 4 -pix_fmt yuva444p10le -c:a copy Output/logo.mov

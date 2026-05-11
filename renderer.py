@@ -309,7 +309,7 @@ def rasterize_parallel(svg_dir, png_dir, workers):
 
 # These need to be available as inputs, or pull out encode entirely, and let
 #  ffmpeg do it's thing on it's own. Or maybe use the library instead of running
-# a subprocess. That may make the whole pipeline easier to do in parallel
+# a sub process. That may make the whole pipeline easier to do in parallel
 def encode(png_dir, out, fps):
   """
   """
@@ -364,7 +364,7 @@ def main():
   """
   """
   p = argparse.ArgumentParser(
-    description="Render an MP4 video from an SVG's XML Scene description."
+    description="Render an MP4 video from an SVG XML Scene description.",
     epilog="Example: "
   )
   p.add_argument("--scene", required=True,
@@ -373,7 +373,7 @@ def main():
     help="Name of output video")
   p.add_argument("--fps", type=int, default=30,
     help="Frames per second of output video")
-  p.add_argument("--duration", type=int, required=True
+  p.add_argument("--duration", type=int, required=True,
     help="Length of output video in seconds")
   p.add_argument("--workers", type=int, default=8,
     help="Number of parallel workers to use for rendering")
