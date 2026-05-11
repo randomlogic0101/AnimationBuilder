@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "animation-builder"
+version = "0.0.1"
+description = "Render animated SVG scenes to MP4 video"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "resvg",
+    "pillow",
+    "imageio",
+    "numpy",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+]
+
+[project.scripts]
+# Command: animation-builder
+# Runs: animation_builder.main:main
+animation-builder = "animation_builder.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -12,13 +12,14 @@
           pillow
           imageio
           numpy
+          resvg-py
         ]);
 
       in pkgs.mkShell {
         packages = [
           pythonEnv
-          pkgs.ffmpeg
           pkgs.resvg
+          pkgs.ffmpeg
           pkgs.fira-code
           pkgs.dejavu_fonts
         ];

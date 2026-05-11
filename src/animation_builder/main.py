@@ -8,8 +8,9 @@ import math
 import shutil
 import subprocess
 import tempfile
+import resvg_py
 
-
+# TODO: drop external resvg call and switch to resvg_py
 # TODO: try and figure out how to use ffmpeg svg_pipe, maybe I can get rid of
 #    rasterizing the frames entirely.
 # TODO: Try and figure out the parallizing code. It doesn't work the way I
@@ -238,6 +239,7 @@ def apply_animations(root, t):
       if fn:
         fn(node, tl)
 
+
 # TODO replace args with explicit variables and unroll object on call
 def write_svg_frame(args):
   """
@@ -252,6 +254,7 @@ def write_svg_frame(args):
     encoding="utf-8",
     xml_declaration=True,
   )
+
 
 # Take this apart and create generate_svg_frame to generate one frame
 # so you can follow the whole pipeline through on the parallel tasks
@@ -274,6 +277,14 @@ def generate_svg_frames(scene_svg, svg_dir, fps, duration):
     write_svg_frame(tasks[i])
     if i % fps == 0:
       print(f"SVG second {i // fps}")
+
+
+# def rasterize_one(svg_path, png_path, scale=1.0):
+#     tree = resvg_py.Tree.from_file(str(svg_path))
+#     width = int(tree.width * scale)
+#     height = int(tree.height * scale)
+#     pixmap = resvg_py.render(tree, scale=scale)
+#     pixmap.save_png(str(png_path))
 
 
 def rasterize_one(svg_path, png_path):
@@ -365,7 +376,10 @@ def main():
   """
   p = argparse.ArgumentParser(
     description="Render an MP4 video from an SVG XML Scene description.",
-    epilog="Example: "
+    epilog="Example: python renderer.py \
+       --scene Assets/inkscapeTest001.svg \
+       --output Output/inkscapeTest.mp4 \
+       --duration $((30))"
   )
   p.add_argument("--scene", required=True,
     help="SVG image with appropriate scene descriptions tags in the XML")
