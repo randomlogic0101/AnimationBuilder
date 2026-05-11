@@ -1,3 +1,4 @@
-Output/*.mp4
+Output
 notes.md
 *\#*
+__pycache__

@@ -67,7 +67,28 @@ def get_timeline(node, t):
   }
 
 
+# TODO: Examine combining scroll_x and scroll_y into one translation function
 def behavior_scroll_x(node, tl):
+  """
+  Set a node's current horizontal position in the animation based on timeline
+  percentage.
+
+  The node's position is interpolated based on the timeline dictionary's
+  current progress percentage
+
+  Args:
+    node -- The node object from the svg's xml. The node object must
+      support set() and get_number()
+    tl -- Timeline dictionary. The 'progress' key is a float between
+      0.0 and 1.0.
+
+  Returns:
+    None
+
+  Example:
+    >>> behavior_scroll_x(my_node, {"progress": 0.5})
+    # If from-x = 0, to-x = 100 -> function sets transform to translate(50, 0)
+  """
   fx = get_number(node, "from-x", 0)
   tx = get_number(node, "to-x", 0)
   x = fx + (tx - fx) * tl["progress"]
@@ -75,37 +96,118 @@ def behavior_scroll_x(node, tl):
 
 
 def behavior_scroll_y(node, tl):
+  """
+  Set a node's current vertical position in the animation based on timeline
+  percentage.
+
+  The node's position is interpolated based on the timeline dictionary's
+  current progress percentage
+
+  Args:
+    node -- The node object from the svg's xml. The node object must
+      support set() and get_number()
+    tl -- Timeline dictionary. The 'progress' key is a float between
+      0.0 and 1.0.
+
+  Returns:
+    None
+
+  Example:
+    >>> behavior_scroll_y(my_node, {"progress": 0.5})
+    # If from-y = 0, to-y = 100 -> function sets transform to translate(50, 0)
+  """
   fy = get_number(node, "from-y", 0)
   ty = get_number(node, "to-y", 0)
   y = fy + (ty - fy) * tl["progress"]
   node.set("transform", f"translate({y}, 0)")
 
 
+# TODO: Examine using fade to do a flash
+# TODO: Think about this function, it's not as intuitive as you originally thought
 def behavior_flash(node, tl):
+  """
+  Set a nodes opacity to 0 or 1 based on the timeline.
+
+  Args:
+    node -- The node object from the svg's xml. The node object must
+      support set() and get_number()
+    tl -- Timeline dictionary. The 't' key is the timeline's local time
+
+  Returns:
+    None
+
+  Example:
+    >>> behavior_flash(node, {"t": 3.0})
+  """
   freq = get_number(node, "frequency", 1)
   phase = (tl["t"] % freq) / freq
   opacity = "1" if phase < 0.5 else "0"
   node.set("opacity", opacity)
 
 
+def behavior_fade(node, tl):
+  """
+  Set a nodes opacity based on the timeline.
+
+  Args:
+    node -- The node object from the svg's xml. The node object must
+      support set() and get_number()
+    tl -- Timeline dictionary. The 'progress' key is a float from 0.0 to 1.0
+
+  Returns:
+    None
+
+  Example:
+    >>> behavior_fade(node, {"progress": 0.5})
+  """
+  f = get_number(node, "from-opacity", 0)
+  t = get_number(node, "to-opacity", 1)
+  op = f + (t - f) * tl["progress"]
+  style = node.attrib.get("style", "")
+  node.set("style", style + f";opacity:{op}")
+
+
+# TODO Consider combining countdown and countup
 def behavior_countdown(node, tl):
+  """
+  Sets the node's text attribute to the current time remaining based on the
+  timeline progress
+
+  Args:
+    node -- The node object from the svg's xml. The node object must
+      support get_number()
+    tl -- Timeline dictionary. The 'progress' key is a float from 0.0 to 1.0
+
+  Returns:
+    None
+
+  Example:
+    >>> behavior_countdown(node, {"progress": 0.5})
+  """
   start = get_number(node, "start", 60)
   remaining = max(0, start - tl["t"])
   node.text = format_time(remaining)
 
 
 def behavior_countup(node, tl):
+  """
+  Sets the node's text attribute to the current running time based on the
+  timeline progress
+
+  Args:
+    node -- The node object from the svg's xml. The node object must
+      support get_number()
+    tl -- Timeline dictionary. The 'progress' key is a float from 0.0 to 1.0
+
+  Returns:
+    None
+
+  Example:
+    >>> behavior_countup(node, {"progress": 0.5})
+  """
   max_t = get_number(node, "max", math.inf)
   elapsed = min(max_t, tl["t"])
   node.text = format_time(elapsed)
-
-
-def behavior_fade(node, tl):
-  f = get_number(node, "from-opacity", 0)
-  t = get_number(node, "to-opacity", 1)
-  op = f + (t - f) * tl["progress"]
-  style = node.attrib.get("style", "")
-  node.set("style", style + f";opacity:{op}")
 
 
 BEHAVIORS = {
@@ -118,7 +220,11 @@ BEHAVIORS = {
 }
 
 
+# TODO Consider Jane's comment of linking the whole pipeline. You could give
+#  each thread the task from apply_animations through rasterizing
 def apply_animations(root, t):
+  """
+  """
   nodes = [n for n in root.iter() if "data-anim" in n.attrib]
 
   for node in nodes:
@@ -132,8 +238,10 @@ def apply_animations(root, t):
       if fn:
         fn(node, tl)
 
-
+# TODO replace args with explicit variables and unroll object on call
 def write_svg_frame(args):
+  """
+  """
   root, t, out_path = args
 
   frame = deepcopy(root)
@@ -145,8 +253,11 @@ def write_svg_frame(args):
     xml_declaration=True,
   )
 
-
+# Take this apart and create generate_svg_frame to generate one frame
+# so you can follow the whole pipeline through on the parallel tasks
 def generate_svg_frames(scene_svg, svg_dir, fps, duration):
+  """
+  """
   tree = ET.parse(scene_svg)
   root = tree.getroot()
 
@@ -166,6 +277,8 @@ def generate_svg_frames(scene_svg, svg_dir, fps, duration):
 
 
 def rasterize_one(svg_path, png_path):
+  """
+  """
   subprocess.run(
     ["resvg", str(svg_path), str(png_path)],
     stdout=subprocess.DEVNULL,
@@ -174,8 +287,9 @@ def rasterize_one(svg_path, png_path):
   )
 
 
-# I don't think this is actually working the way I think it does, I don't get it
 def rasterize_parallel(svg_dir, png_dir, workers):
+  """
+  """
   svg_files = sorted(svg_dir.glob("frame_*.svg"))
   png_dir.mkdir(parents=True, exist_ok=True)
 
@@ -186,13 +300,19 @@ def rasterize_parallel(svg_dir, png_dir, workers):
       png = png_dir / (svg.stem + ".png")
       futures.append(pool.submit(rasterize_one, svg, png))
 
+    # This is wrong, the frame order is not deterministic
     for i, f in enumerate(as_completed(futures)):
       f.result()
       if i % 30 == 0:
         print(f"Raster second {i // 30}")
 
 
+# These need to be available as inputs, or pull out encode entirely, and let
+#  ffmpeg do it's thing on it's own. Or maybe use the library instead of running
+# a subprocess. That may make the whole pipeline easier to do in parallel
 def encode(png_dir, out, fps):
+  """
+  """
   subprocess.run(
     [
       "ffmpeg",
@@ -218,6 +338,8 @@ def encode(png_dir, out, fps):
 
 
 def render(scene_svg, output, fps, duration, workers):
+  """
+  """
   tmp = Path(tempfile.mkdtemp(prefix="svg_anim_"))
   svg_dir = tmp / "svg"
   png_dir = tmp / "png"
@@ -239,12 +361,22 @@ def render(scene_svg, output, fps, duration, workers):
 
 
 def main():
-  p = argparse.ArgumentParser()
-  p.add_argument("--scene", required=True)
-  p.add_argument("--output", default="out.mp4")
-  p.add_argument("--fps", type=int, default=30)
-  p.add_argument("--duration", type=int, required=True)
-  p.add_argument("--workers", type=int, default=8)
+  """
+  """
+  p = argparse.ArgumentParser(
+    description="Render an MP4 video from an SVG's XML Scene description."
+    epilog="Example: "
+  )
+  p.add_argument("--scene", required=True,
+    help="SVG image with appropriate scene descriptions tags in the XML")
+  p.add_argument("--output", default="out.mp4",
+    help="Name of output video")
+  p.add_argument("--fps", type=int, default=30,
+    help="Frames per second of output video")
+  p.add_argument("--duration", type=int, required=True
+    help="Length of output video in seconds")
+  p.add_argument("--workers", type=int, default=8,
+    help="Number of parallel workers to use for rendering")
   args = p.parse_args()
 
   render(
